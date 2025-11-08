@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { SparklesCore } from "@/components/sparkles";
 import axios from "axios";
 
 interface Prediction {
@@ -325,27 +326,68 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center text-white mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-3">
-            <Bot className="w-10 h-10" />
-            Robot vs Human Classifier
-          </h1>
-          <p className="text-lg md:text-xl opacity-90">
-            AI-powered image classification using deep learning
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Animated background particles */}
+      <div className="w-full absolute inset-0 min-h-screen">
+        <SparklesCore
+          id="tsparticlesfullpage"
+          background="transparent"
+          minSize={0.6}
+          maxSize={1.4}
+          particleDensity={80}
+          className="w-full h-full"
+          particleColor="#FFFFFF"
+          speed={0.5}
+        />
+      </div>
+
+      {/* Gradient overlay for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-900/20 via-purple-900/20 to-indigo-900/20 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10 p-4 md:p-8">
+        {/* Header with futuristic design */}
+        <div className="text-center text-white mb-12 relative">
+          <div className="mb-8">
+            {/* Decorative gradient lines */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-0 w-3/4 max-w-2xl">
+              <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-violet-500 to-transparent h-[2px] w-full blur-sm" />
+              <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-violet-500 to-transparent h-px w-full" />
+              <div className="absolute inset-x-40 top-0 bg-gradient-to-r from-transparent via-purple-400 to-transparent h-[3px] w-3/4 blur-sm mx-auto" />
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 flex items-center justify-center gap-4 pt-8">
+              <Bot className="w-12 h-12 md:w-16 md:h-16 text-violet-400 drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]" />
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-violet-200 to-violet-500">
+                Robot vs Human
+              </span>
+            </h1>
+
+            <div className="relative inline-block">
+              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400">
+                AI Classifier
+              </h2>
+              {/* Animated underline */}
+              <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent animate-pulse" />
+            </div>
+          </div>
+
+          <p className="text-lg md:text-xl text-violet-200/90 max-w-2xl mx-auto">
+            Advanced deep learning powered image classification system
           </p>
+
+          {/* Decorative corner elements */}
+          <div className="absolute -top-4 -left-4 w-32 h-32 border-l-2 border-t-2 border-violet-500/30 rounded-tl-3xl" />
+          <div className="absolute -top-4 -right-4 w-32 h-32 border-r-2 border-t-2 border-purple-500/30 rounded-tr-3xl" />
         </div>
 
         {/* Camera Modal */}
         {showCamera && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
             <div className="relative w-full max-w-4xl">
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-violet-500 to-purple-600 text-white">
+              <Card className="overflow-hidden bg-black/90 backdrop-blur-xl border-violet-500/50 shadow-2xl shadow-violet-500/30">
+                <CardHeader className="bg-gradient-to-r from-violet-600/90 to-purple-600/90 backdrop-blur-sm text-white border-b border-violet-400/30">
                   <CardTitle className="flex items-center gap-2">
-                    <Camera className="w-6 h-6" />
+                    <Camera className="w-6 h-6 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                     Camera
                   </CardTitle>
                   <CardDescription className="text-white/90">
@@ -355,20 +397,24 @@ export default function Home() {
                 <CardContent className="p-0">
                   {cameraError ? (
                     <div className="p-8 text-center">
-                      <div className="text-red-500 mb-4">
-                        <X className="w-16 h-16 mx-auto mb-4" />
+                      <div className="text-red-400 mb-4">
+                        <X className="w-16 h-16 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
                         <p className="text-lg font-semibold mb-2">
                           Camera Access Error
                         </p>
-                        <p className="text-sm text-gray-600">{cameraError}</p>
+                        <p className="text-sm text-violet-300">{cameraError}</p>
                       </div>
-                      <Button onClick={stopCamera} variant="outline">
+                      <Button
+                        onClick={stopCamera}
+                        variant="outline"
+                        className="border-violet-500/50 hover:bg-violet-500/20 text-violet-200 hover:text-white backdrop-blur-sm"
+                      >
                         Close
                       </Button>
                     </div>
                   ) : (
                     <>
-                      <div className="relative bg-black min-h-[400px] flex items-center justify-center">
+                      <div className="relative bg-black min-h-[400px] flex items-center justify-center border-y border-violet-500/30">
                         <video
                           ref={videoRef}
                           autoPlay
@@ -376,12 +422,17 @@ export default function Home() {
                           muted
                           className="w-full h-auto max-h-[60vh] object-contain"
                         />
+                        {/* Decorative corner overlays */}
+                        <div className="absolute top-4 left-4 w-16 h-16 border-l-2 border-t-2 border-violet-500/50 rounded-tl-lg" />
+                        <div className="absolute top-4 right-4 w-16 h-16 border-r-2 border-t-2 border-violet-500/50 rounded-tr-lg" />
+                        <div className="absolute bottom-4 left-4 w-16 h-16 border-l-2 border-b-2 border-violet-500/50 rounded-bl-lg" />
+                        <div className="absolute bottom-4 right-4 w-16 h-16 border-r-2 border-b-2 border-violet-500/50 rounded-br-lg" />
                       </div>
-                      <div className="p-4 flex gap-3 justify-center bg-gray-50">
+                      <div className="p-4 flex gap-3 justify-center bg-gradient-to-r from-violet-950/50 to-purple-950/50 backdrop-blur-sm">
                         <Button
                           onClick={capturePhoto}
                           size="lg"
-                          className="flex-1 max-w-xs"
+                          className="flex-1 max-w-xs bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/50 border-0"
                         >
                           <Camera className="mr-2 h-5 w-5" />
                           Capture Photo
@@ -390,6 +441,7 @@ export default function Home() {
                           onClick={stopCamera}
                           variant="outline"
                           size="lg"
+                          className="border-violet-500/50 hover:bg-violet-500/20 text-violet-200 hover:text-white backdrop-blur-sm"
                         >
                           <X className="mr-2 h-5 w-5" />
                           Cancel
@@ -405,52 +457,55 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* Upload Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Image</CardTitle>
-              <CardDescription>
+          <Card className="bg-white/10 backdrop-blur-xl border-violet-500/30 shadow-2xl shadow-violet-500/20">
+            <CardHeader className="border-b border-violet-500/20">
+              <CardTitle className="text-white flex items-center gap-2">
+                <Upload className="w-5 h-5 text-violet-400" />
+                Upload Image
+              </CardTitle>
+              <CardDescription className="text-violet-200/70">
                 Drag and drop, use camera, or click to select an image
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-6">
               {/* Camera Button */}
               <Button
                 onClick={startCamera}
                 variant="outline"
-                className="w-full border-2 border-dashed hover:border-primary hover:bg-primary/5"
+                className="w-full border-2 border-dashed border-violet-400/50 hover:border-violet-400 hover:bg-violet-500/20 bg-violet-950/30 text-white backdrop-blur-sm transition-all duration-300"
                 size="lg"
               >
-                <Camera className="mr-2 h-5 w-5" />
+                <Camera className="mr-2 h-5 w-5 text-violet-400" />
                 Use Camera
               </Button>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+                  <span className="w-full border-t border-violet-500/30" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-muted-foreground">
+                  <span className="bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full text-violet-300 border border-violet-500/30">
                     Or
                   </span>
                 </div>
               </div>
 
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ${
                   isDragging
-                    ? "border-primary bg-primary/10"
-                    : "border-gray-300 hover:border-primary/50 hover:bg-gray-50"
+                    ? "border-violet-400 bg-violet-500/20 shadow-lg shadow-violet-500/50"
+                    : "border-violet-500/30 hover:border-violet-400/70 hover:bg-violet-950/30 bg-black/30 backdrop-blur-sm"
                 }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => document.getElementById("fileInput")?.click()}
               >
-                <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-sm text-gray-600">
+                <Upload className="w-12 h-12 mx-auto mb-4 text-violet-400 drop-shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
+                <p className="text-sm text-violet-200">
                   Click or drag image here
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-violet-300/60 mt-2">
                   Supported: JPG, PNG, GIF, BMP
                 </p>
               </div>
@@ -465,17 +520,19 @@ export default function Home() {
 
               {preview && (
                 <div className="space-y-4">
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="max-w-full h-auto max-h-64 mx-auto rounded-lg shadow-lg"
-                  />
+                  <div className="relative rounded-lg overflow-hidden ring-2 ring-violet-500/50 shadow-2xl shadow-violet-500/30">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="max-w-full h-auto max-h-64 mx-auto"
+                    />
+                  </div>
 
                   <div className="flex gap-2 justify-center">
                     <Button
                       onClick={handlePredict}
                       disabled={loading || !selectedFile}
-                      className="flex-1 max-w-xs"
+                      className="flex-1 max-w-xs bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/50 border-0"
                     >
                       {loading ? (
                         <>
@@ -486,7 +543,11 @@ export default function Home() {
                         "Classify Image"
                       )}
                     </Button>
-                    <Button onClick={handleClear} variant="outline">
+                    <Button
+                      onClick={handleClear}
+                      variant="outline"
+                      className="border-violet-500/50 hover:bg-violet-500/20 text-violet-200 hover:text-white backdrop-blur-sm"
+                    >
                       Clear
                     </Button>
                   </div>
@@ -496,23 +557,26 @@ export default function Home() {
           </Card>
 
           {/* Results Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Results</CardTitle>
-              <CardDescription>
+          <Card className="bg-white/10 backdrop-blur-xl border-violet-500/30 shadow-2xl shadow-purple-500/20">
+            <CardHeader className="border-b border-violet-500/20">
+              <CardTitle className="text-white flex items-center gap-2">
+                <Bot className="w-5 h-5 text-purple-400" />
+                Results
+              </CardTitle>
+              <CardDescription className="text-violet-200/70">
                 Classification results will appear here
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {prediction ? (
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg p-6 text-center">
+                  <div className="bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm text-white rounded-lg p-6 text-center shadow-2xl shadow-violet-500/30 border border-violet-400/30">
                     <p className="text-sm opacity-90 mb-2">Prediction:</p>
                     <div className="text-3xl font-bold uppercase mb-4 flex items-center justify-center gap-2">
                       {prediction.class === "robot" ? (
-                        <Bot className="w-8 h-8" />
+                        <Bot className="w-8 h-8 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                       ) : (
-                        <User className="w-8 h-8" />
+                        <User className="w-8 h-8 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                       )}
                       {prediction.class}
                     </div>
@@ -526,8 +590,8 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-gray-400 py-12">
-                  <Bot className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                <div className="text-center text-violet-300/60 py-12 bg-black/20 rounded-lg backdrop-blur-sm border border-violet-500/20">
+                  <Bot className="w-16 h-16 mx-auto mb-4 opacity-30 drop-shadow-[0_0_10px_rgba(139,92,246,0.3)]" />
                   <p>No prediction yet</p>
                   <p className="text-sm mt-2">Upload an image to get started</p>
                 </div>
@@ -535,31 +599,35 @@ export default function Home() {
 
               {/* Statistics */}
               <div className="grid grid-cols-2 gap-3 mt-6">
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-primary">
+                <div className="bg-gradient-to-br from-violet-950/50 to-purple-950/50 backdrop-blur-sm p-4 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20">
+                  <div className="text-2xl font-bold text-violet-300">
                     {statistics.total_predictions}
                   </div>
-                  <div className="text-xs text-gray-600">Total Predictions</div>
+                  <div className="text-xs text-violet-400/70">
+                    Total Predictions
+                  </div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-primary">
+                <div className="bg-gradient-to-br from-violet-950/50 to-purple-950/50 backdrop-blur-sm p-4 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20">
+                  <div className="text-2xl font-bold text-violet-300">
                     {statistics.average_confidence
                       ? `${(statistics.average_confidence * 100).toFixed(1)}%`
                       : "0%"}
                   </div>
-                  <div className="text-xs text-gray-600">Avg Confidence</div>
+                  <div className="text-xs text-violet-400/70">
+                    Avg Confidence
+                  </div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-red-500">
+                <div className="bg-gradient-to-br from-violet-950/50 to-purple-950/50 backdrop-blur-sm p-4 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20">
+                  <div className="text-2xl font-bold text-red-400">
                     {statistics.predictions_by_class?.robot || 0}
                   </div>
-                  <div className="text-xs text-gray-600">Robots</div>
+                  <div className="text-xs text-violet-400/70">Robots</div>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-green-500">
+                <div className="bg-gradient-to-br from-violet-950/50 to-purple-950/50 backdrop-blur-sm p-4 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20">
+                  <div className="text-2xl font-bold text-green-400">
                     {statistics.predictions_by_class?.human || 0}
                   </div>
-                  <div className="text-xs text-gray-600">Humans</div>
+                  <div className="text-xs text-violet-400/70">Humans</div>
                 </div>
               </div>
             </CardContent>
@@ -567,12 +635,15 @@ export default function Home() {
         </div>
 
         {/* History Section */}
-        <Card>
-          <CardHeader>
+        <Card className="bg-white/10 backdrop-blur-xl border-violet-500/30 shadow-2xl shadow-indigo-500/20">
+          <CardHeader className="border-b border-violet-500/20">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle>Recent Predictions</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Trash2 className="w-5 h-5 text-indigo-400" />
+                  Recent Predictions
+                </CardTitle>
+                <CardDescription className="text-violet-200/70">
                   View your classification history
                 </CardDescription>
               </div>
@@ -581,6 +652,7 @@ export default function Home() {
                   variant="destructive"
                   size="sm"
                   onClick={handleClearAll}
+                  className="bg-red-600/80 hover:bg-red-600 backdrop-blur-sm shadow-lg shadow-red-500/30"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Clear All
@@ -588,15 +660,15 @@ export default function Home() {
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {history.length > 0 ? (
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
                 {history.map((pred) => (
                   <div
                     key={pred.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-3 bg-violet-950/30 backdrop-blur-sm rounded-lg hover:bg-violet-900/40 transition-all duration-300 border border-violet-500/20 hover:border-violet-500/40 shadow-md"
                   >
-                    <span className="text-sm flex-1 truncate">
+                    <span className="text-sm flex-1 truncate text-violet-200">
                       {pred.filename}
                     </span>
                     <Badge
@@ -605,26 +677,30 @@ export default function Home() {
                           ? "destructive"
                           : "default"
                       }
-                      className="mx-2"
+                      className={`mx-2 ${
+                        pred.predicted_class === "robot"
+                          ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
+                          : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
+                      }`}
                     >
                       {pred.predicted_class.toUpperCase()}
                     </Badge>
-                    <span className="text-sm font-medium min-w-[60px] text-right">
+                    <span className="text-sm font-medium min-w-[60px] text-right text-violet-300">
                       {(pred.confidence * 100).toFixed(1)}%
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeletePrediction(pred.id)}
-                      className="ml-2"
+                      className="ml-2 hover:bg-red-500/20 text-red-400 hover:text-red-300"
                     >
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-400 py-12">
+              <div className="text-center text-violet-300/60 py-12 bg-black/20 rounded-lg backdrop-blur-sm border border-violet-500/20">
                 <p>No predictions yet</p>
                 <p className="text-sm mt-2">
                   Start classifying images to see your history
