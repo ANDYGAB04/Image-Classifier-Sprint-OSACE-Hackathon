@@ -10,6 +10,7 @@ import {
   Camera,
   X,
   BarChart3,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -599,13 +600,19 @@ export default function Home() {
                 <div className="bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm text-white rounded-lg p-8 text-center shadow-2xl shadow-violet-500/30 border border-violet-400/30">
                   <p className="text-sm opacity-90 mb-3">Prediction:</p>
                   <div className="flex items-center justify-center gap-3 mb-6">
-                    {prediction.class === "robot" ? (
+                    {prediction.confidence < 0.6 ? (
+                      <AlertCircle className="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                    ) : prediction.class === "robot" ? (
                       <Bot className="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                     ) : (
                       <User className="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
                     )}
                     <SparklesText
-                      text={prediction.class.toUpperCase()}
+                      text={
+                        prediction.confidence < 0.6
+                          ? "UNSURE"
+                          : prediction.class.toUpperCase()
+                      }
                       colors={{ first: "#ffffff", second: "#e0c3fc" }}
                       sparklesCount={15}
                       className="text-4xl md:text-5xl font-bold"
@@ -618,6 +625,11 @@ export default function Home() {
                   <p className="text-xl font-semibold">
                     Confidence: {(prediction.confidence * 100).toFixed(2)}%
                   </p>
+                  {prediction.confidence < 0.6 && (
+                    <p className="text-sm mt-3 opacity-80">
+                      Low confidence - try a clearer image
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
@@ -793,63 +805,88 @@ export default function Home() {
                 return (
                   <div
                     key={pred.id}
-                    className="flex flex-col gap-2 p-4 bg-violet-950/40 backdrop-blur-md rounded-lg hover:bg-violet-900/50 transition-all duration-300 border border-violet-500/30 hover:border-violet-400/50 shadow-md"
+                    className="flex gap-4 p-4 bg-violet-950/40 backdrop-blur-md rounded-lg hover:bg-violet-900/50 transition-all duration-300 border border-violet-500/30 hover:border-violet-400/50 shadow-md"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm flex-1 truncate text-violet-200 font-medium">
-                        {pred.filename}
-                      </span>
-                      <Badge
-                        variant={
-                          pred.predicted_class === "robot"
-                            ? "destructive"
-                            : "default"
-                        }
-                        className={`mx-3 ${
-                          pred.predicted_class === "robot"
-                            ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
-                            : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
-                        }`}
-                      >
-                        {pred.predicted_class.toUpperCase()}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeletePrediction(pred.id)}
-                        className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-violet-300">
-                            Confidence
-                          </span>
-                          <span
-                            className={`text-xs font-bold ${getConfidenceBgColor(
-                              confidencePercent
-                            )} px-2 py-1 rounded`}
-                          >
-                            {confidencePercent.toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden">
-                          <div
-                            className={`h-full bg-gradient-to-r ${getConfidenceColor(
-                              confidencePercent
-                            )} transition-all duration-300 rounded-full shadow-lg`}
-                            style={{ width: `${confidencePercent}%` }}
-                          />
-                        </div>
+                    {/* Image Preview */}
+                    <div className="flex-shrink-0">
+                      <div className="w-24 h-24 rounded-lg overflow-hidden ring-2 ring-violet-500/50 bg-black/50">
+                        <img
+                          src={`http://localhost:5000/uploads/${pred.filename}`}
+                          alt={pred.filename}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            e.currentTarget.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E";
+                          }}
+                        />
                       </div>
                     </div>
 
-                    <div className="text-xs text-violet-400/60">
-                      {new Date(pred.timestamp).toLocaleString()}
+                    {/* Content */}
+                    <div className="flex-1 flex flex-col gap-2 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm flex-1 truncate text-violet-200 font-medium">
+                          {pred.filename}
+                        </span>
+                        <Badge
+                          variant={
+                            confidencePercent < 60
+                              ? "secondary"
+                              : pred.predicted_class === "robot"
+                              ? "destructive"
+                              : "default"
+                          }
+                          className={`flex-shrink-0 ${
+                            confidencePercent < 60
+                              ? "bg-yellow-500/80 hover:bg-yellow-500 shadow-lg shadow-yellow-500/30"
+                              : pred.predicted_class === "robot"
+                              ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
+                              : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
+                          }`}
+                        >
+                          {confidencePercent < 60
+                            ? "UNSURE"
+                            : pred.predicted_class.toUpperCase()}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePrediction(pred.id)}
+                          className="hover:bg-red-500/20 text-red-400 hover:text-red-300 flex-shrink-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-violet-300">
+                              Confidence
+                            </span>
+                            <span
+                              className={`text-xs font-bold ${getConfidenceBgColor(
+                                confidencePercent
+                              )} px-2 py-1 rounded`}
+                            >
+                              {confidencePercent.toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden">
+                            <div
+                              className={`h-full bg-gradient-to-r ${getConfidenceColor(
+                                confidencePercent
+                              )} transition-all duration-300 rounded-full shadow-lg`}
+                              style={{ width: `${confidencePercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-violet-400/60">
+                        {new Date(pred.timestamp).toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 );
