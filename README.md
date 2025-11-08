@@ -600,7 +600,7 @@ _Benchmarks are approximate and vary based on image size and system configuratio
 ## Getting Help
 
 - 📖 Check the FAQ section above
-- 📝 Review documentation files (QUICKSTART.md, CLAUDE.md, MOBILE_CAMERA_SETUP.md)
+- 📝 Review documentation files (QUICKSTART.md)
 - 🐛 Open an issue on GitHub
 - 💬 Check existing issues for solutions
 
