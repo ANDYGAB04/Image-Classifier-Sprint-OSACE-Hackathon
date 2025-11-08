@@ -392,11 +392,8 @@ export default function Home() {
           {/* Analytics Link */}
           <div className="mt-6">
             <Link href="/analytics">
-              <Button
-                variant="outline"
-                className="border-violet-400/50 hover:bg-violet-500/20 text-violet-200 hover:text-white backdrop-blur-sm inline-flex items-center gap-2"
-              >
-                <BarChart3 className="w-4 h-4" />
+              <Button className="relative border-2 border-violet-400 hover:border-violet-300 bg-gradient-to-r from-violet-600/20 to-purple-600/20 hover:from-violet-600/40 hover:to-purple-600/40 text-violet-200 hover:text-white backdrop-blur-sm inline-flex items-center gap-2 h-11 px-6 py-2 rounded-lg font-semibold transition-all duration-300 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-105">
+                <BarChart3 className="w-5 h-5" />
                 View Analytics & Metrics
               </Button>
             </Link>
@@ -500,7 +497,7 @@ export default function Home() {
             <Button
               onClick={startCamera}
               variant="outline"
-              className="w-full border-2 border-dashed border-violet-400/50 hover:border-violet-400 hover:bg-violet-500/20 bg-violet-950/30 text-white backdrop-blur-sm transition-all duration-300"
+              className="w-full border-2 border-dashed border-violet-400/50 hover:border-violet-400 hover:bg-violet-500/20 bg-violet-950/30 text-violet-200 hover:text-white backdrop-blur-sm transition-all duration-300"
               size="lg"
             >
               <Camera className="mr-2 h-5 w-5 text-violet-400" />
@@ -627,7 +624,9 @@ export default function Home() {
                   </p>
                   {prediction.confidence < 0.6 && (
                     <p className="text-sm mt-3 opacity-80">
-                      Low confidence - try a clearer image
+                      {prediction.confidence < 0.7
+                        ? "Low confidence - image may not be a robot or human"
+                        : "Moderate confidence - result may be uncertain"}
                     </p>
                   )}
                 </div>
@@ -641,38 +640,38 @@ export default function Home() {
             )}
 
             {/* Statistics */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
-                <div className="text-3xl font-bold text-violet-300 mb-1">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-3 sm:p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
+                <div className="text-2xl sm:text-3xl font-bold text-violet-300 mb-1">
                   {statistics.total_predictions}
                 </div>
-                <div className="text-xs text-violet-400/70 uppercase tracking-wide">
+                <div className="text-[10px] sm:text-xs text-violet-400/70 uppercase tracking-wide">
                   Total Predictions
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
-                <div className="text-3xl font-bold text-violet-300 mb-1">
+              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-3 sm:p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
+                <div className="text-2xl sm:text-3xl font-bold text-violet-300 mb-1">
                   {statistics.average_confidence
                     ? `${(statistics.average_confidence * 100).toFixed(1)}%`
                     : "0%"}
                 </div>
-                <div className="text-xs text-violet-400/70 uppercase tracking-wide">
+                <div className="text-[10px] sm:text-xs text-violet-400/70 uppercase tracking-wide">
                   Avg Confidence
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
-                <div className="text-3xl font-bold text-red-400 mb-1">
+              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-3 sm:p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
+                <div className="text-2xl sm:text-3xl font-bold text-red-400 mb-1">
                   {statistics.predictions_by_class?.robot || 0}
                 </div>
-                <div className="text-xs text-violet-400/70 uppercase tracking-wide">
+                <div className="text-[10px] sm:text-xs text-violet-400/70 uppercase tracking-wide">
                   Robots
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
-                <div className="text-3xl font-bold text-green-400 mb-1">
+              <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-3 sm:p-5 rounded-lg text-center border border-violet-500/30 shadow-lg shadow-violet-500/20 hover:border-violet-400/50 transition-all duration-300">
+                <div className="text-2xl sm:text-3xl font-bold text-green-400 mb-1">
                   {statistics.predictions_by_class?.human || 0}
                 </div>
-                <div className="text-xs text-violet-400/70 uppercase tracking-wide">
+                <div className="text-[10px] sm:text-xs text-violet-400/70 uppercase tracking-wide">
                   Humans
                 </div>
               </div>
@@ -682,7 +681,7 @@ export default function Home() {
 
         {/* History Section */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
                 <Trash2 className="w-6 h-6 text-indigo-400" />
@@ -697,7 +696,7 @@ export default function Home() {
                 variant="destructive"
                 size="sm"
                 onClick={handleClearAll}
-                className="bg-red-600/80 hover:bg-red-600 backdrop-blur-sm shadow-lg shadow-red-500/30"
+                className="bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-sm shadow-lg shadow-red-500/30"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Clear All
@@ -706,15 +705,15 @@ export default function Home() {
           </div>
 
           {/* Confidence Threshold Filter */}
-          <div className="bg-gradient-to-r from-violet-950/60 to-purple-950/60 backdrop-blur-md p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
+          <div className="bg-gradient-to-r from-violet-950/60 to-purple-950/60 backdrop-blur-md p-4 sm:p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
             <div className="space-y-4">
-              <h4 className="text-sm font-bold text-white uppercase tracking-wide flex items-center gap-2">
+              <h4 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wide flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-violet-400 rounded-full" />
                 Confidence Threshold Filter
               </h4>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-2 sm:gap-4">
                   <div className="flex-1">
                     <label className="text-xs text-violet-300 font-medium">
                       Minimum: {minConfidence}%
@@ -733,12 +732,12 @@ export default function Home() {
                       className="w-full h-2 bg-violet-900/50 rounded-lg appearance-none cursor-pointer accent-violet-500"
                     />
                   </div>
-                  <div className="text-xs text-violet-400 font-medium">
+                  <div className="text-xs text-violet-400 font-medium min-w-[40px] text-right">
                     {minConfidence}%
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-2 sm:gap-4">
                   <div className="flex-1">
                     <label className="text-xs text-violet-300 font-medium">
                       Maximum: {maxConfidence}%
@@ -757,7 +756,7 @@ export default function Home() {
                       className="w-full h-2 bg-violet-900/50 rounded-lg appearance-none cursor-pointer accent-purple-500"
                     />
                   </div>
-                  <div className="text-xs text-purple-400 font-medium">
+                  <div className="text-xs text-purple-400 font-medium min-w-[40px] text-right">
                     {maxConfidence}%
                   </div>
                 </div>
@@ -774,8 +773,7 @@ export default function Home() {
                       setMinConfidence(0);
                       setMaxConfidence(100);
                     }}
-                    variant="outline"
-                    className="h-7 text-xs border-violet-500/50 text-violet-300 hover:bg-violet-500/20 backdrop-blur-sm"
+                    className="h-7 text-xs border-2 border-violet-500/50 hover:border-violet-400 bg-transparent hover:bg-violet-500/20 text-violet-300 hover:text-white backdrop-blur-sm rounded-md font-medium transition-colors px-3"
                   >
                     Reset
                   </Button>
@@ -811,7 +809,7 @@ export default function Home() {
                     <div className="flex-shrink-0">
                       <div className="w-24 h-24 rounded-lg overflow-hidden ring-2 ring-violet-500/50 bg-black/50">
                         <img
-                          src={`http://localhost:5000/uploads/${pred.filename}`}
+                          src={`/api/uploads/${pred.filename}`}
                           alt={pred.filename}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -831,21 +829,21 @@ export default function Home() {
                         </span>
                         <Badge
                           variant={
-                            confidencePercent < 60
+                            confidencePercent < 85
                               ? "secondary"
                               : pred.predicted_class === "robot"
                               ? "destructive"
                               : "default"
                           }
                           className={`flex-shrink-0 ${
-                            confidencePercent < 60
+                            confidencePercent < 85
                               ? "bg-yellow-500/80 hover:bg-yellow-500 shadow-lg shadow-yellow-500/30"
                               : pred.predicted_class === "robot"
                               ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
                               : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
                           }`}
                         >
-                          {confidencePercent < 60
+                          {confidencePercent < 85
                             ? "UNSURE"
                             : pred.predicted_class.toUpperCase()}
                         </Badge>

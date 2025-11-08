@@ -54,23 +54,23 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-bold text-white mb-4">Confusion Matrix</h3>
-        <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
-          <div className="grid grid-cols-3 gap-2 w-fit">
+        <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-4 sm:p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20 overflow-x-auto">
+          <div className="grid grid-cols-3 gap-1 sm:gap-2 w-fit min-w-full sm:min-w-0 mx-auto">
             {/* Header row */}
-            <div className="w-24 h-12 flex items-center justify-center text-sm font-bold text-violet-300" />
-            <div className="w-32 h-12 flex items-center justify-center text-sm font-bold text-green-400 bg-green-500/10 rounded border border-green-500/30">
+            <div className="w-16 sm:w-24 h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm font-bold text-violet-300" />
+            <div className="w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm font-bold text-green-400 bg-green-500/10 rounded border border-green-500/30 px-1">
               Predicted: Human
             </div>
-            <div className="w-32 h-12 flex items-center justify-center text-sm font-bold text-red-400 bg-red-500/10 rounded border border-red-500/30">
+            <div className="w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm font-bold text-red-400 bg-red-500/10 rounded border border-red-500/30 px-1">
               Predicted: Robot
             </div>
 
             {/* True Human row */}
-            <div className="w-24 h-12 flex items-center justify-center text-sm font-bold text-violet-300 bg-violet-500/10 rounded border border-violet-500/30">
+            <div className="w-16 sm:w-24 h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm font-bold text-violet-300 bg-violet-500/10 rounded border border-violet-500/30 px-1">
               True: Human
             </div>
             <div
-              className={`w-32 h-12 flex items-center justify-center text-lg font-bold text-white rounded border border-green-500/50 ${getColor(
+              className={`w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-base sm:text-lg font-bold text-white rounded border border-green-500/50 ${getColor(
                 matrix.true_human_predicted_human,
                 true
               )}`}
@@ -78,7 +78,7 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
               {matrix.true_human_predicted_human}
             </div>
             <div
-              className={`w-32 h-12 flex items-center justify-center text-lg font-bold text-white rounded border border-red-500/50 ${getColor(
+              className={`w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-base sm:text-lg font-bold text-white rounded border border-red-500/50 ${getColor(
                 matrix.true_human_predicted_robot,
                 false
               )}`}
@@ -87,11 +87,11 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
             </div>
 
             {/* True Robot row */}
-            <div className="w-24 h-12 flex items-center justify-center text-sm font-bold text-violet-300 bg-violet-500/10 rounded border border-violet-500/30">
+            <div className="w-16 sm:w-24 h-10 sm:h-12 flex items-center justify-center text-xs sm:text-sm font-bold text-violet-300 bg-violet-500/10 rounded border border-violet-500/30 px-1">
               True: Robot
             </div>
             <div
-              className={`w-32 h-12 flex items-center justify-center text-lg font-bold text-white rounded border border-red-500/50 ${getColor(
+              className={`w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-base sm:text-lg font-bold text-white rounded border border-red-500/50 ${getColor(
                 matrix.true_robot_predicted_human,
                 false
               )}`}
@@ -99,7 +99,7 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
               {matrix.true_robot_predicted_human}
             </div>
             <div
-              className={`w-32 h-12 flex items-center justify-center text-lg font-bold text-white rounded border border-green-500/50 ${getColor(
+              className={`w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center text-base sm:text-lg font-bold text-white rounded border border-green-500/50 ${getColor(
                 matrix.true_robot_predicted_robot,
                 true
               )}`}
@@ -136,9 +136,9 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
             Performance Metrics
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 gap-4 mb-6">
             {/* Overall Accuracy */}
-            <div className="bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm text-white rounded-lg p-6 text-center shadow-2xl shadow-violet-500/30 border border-violet-400/30">
+            <div className="bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm text-white rounded-lg p-6 text-center shadow-2xl shadow-violet-500/30 border border-violet-400/30 max-w-sm mx-auto w-full">
               <div className="text-4xl font-bold mb-2">
                 {(metrics.accuracy * 100).toFixed(1)}%
               </div>
@@ -149,8 +149,8 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
           {/* Per-class metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Human Metrics */}
-            <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
-              <h4 className="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
+            <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-4 sm:p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
+              <h4 className="text-base sm:text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
                 <span className="inline-block w-3 h-3 bg-green-400 rounded-full" />
                 Human Class Metrics
               </h4>
@@ -183,8 +183,8 @@ export function ConfusionMatrix({ matrix, metrics }: ConfusionMatrixProps) {
             </div>
 
             {/* Robot Metrics */}
-            <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
-              <h4 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
+            <div className="bg-gradient-to-br from-violet-950/60 to-purple-950/60 backdrop-blur-md p-4 sm:p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
+              <h4 className="text-base sm:text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
                 <span className="inline-block w-3 h-3 bg-red-400 rounded-full" />
                 Robot Class Metrics
               </h4>

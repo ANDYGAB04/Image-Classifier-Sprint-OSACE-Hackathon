@@ -117,8 +117,7 @@ export default function Analytics() {
         <div className="flex items-center justify-between mb-8">
           <Button
             onClick={() => router.push("/")}
-            variant="outline"
-            className="border-violet-500/50 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200 backdrop-blur-sm inline-flex items-center gap-2"
+            className="border-2 border-violet-500/50 hover:border-violet-400 bg-transparent hover:bg-violet-500/20 text-violet-300 hover:text-white backdrop-blur-sm inline-flex items-center gap-2 h-10 px-4 py-2 rounded-md font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Classifier
@@ -139,28 +138,28 @@ export default function Analytics() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-4 mb-8 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 justify-center px-4">
           <Button
             onClick={() => setActiveTab("distribution")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg border backdrop-blur-sm transition-all ${
+            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-2 rounded-lg border backdrop-blur-sm transition-all text-sm sm:text-base ${
               activeTab === "distribution"
                 ? "bg-violet-600 text-white border-violet-400 shadow-lg shadow-violet-500/30"
                 : "border-violet-500/30 text-violet-300 hover:bg-violet-500/20"
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
-            Distribution Analysis
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span>Distribution Analysis</span>
           </Button>
           <Button
             onClick={() => setActiveTab("confusion")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg border backdrop-blur-sm transition-all ${
+            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-2 rounded-lg border backdrop-blur-sm transition-all text-sm sm:text-base ${
               activeTab === "confusion"
                 ? "bg-violet-600 text-white border-violet-400 shadow-lg shadow-violet-500/30"
                 : "border-violet-500/30 text-violet-300 hover:bg-violet-500/20"
             }`}
           >
-            <PieChart className="w-4 h-4" />
-            Model Evaluation
+            <PieChart className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span>Model Evaluation</span>
           </Button>
         </div>
 
