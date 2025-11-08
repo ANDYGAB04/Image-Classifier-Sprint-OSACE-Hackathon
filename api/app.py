@@ -6,6 +6,7 @@ Provides endpoints for image upload, prediction, and viewing results.
 import os
 import sys
 from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import glob
@@ -18,6 +19,7 @@ from src.database import PredictionDatabase
 from src.preprocess import validate_image_format
 
 app = Flask(__name__)
+CORS(app)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'

@@ -5,12 +5,14 @@ A deep learning-powered image classification system that distinguishes between r
 ## Features
 
 - **High-Accuracy Classification**: CNN-based model with transfer learning support (MobileNetV2)
-- **Web Interface**: User-friendly Flask web application for image upload and prediction
-- **RESTful API**: HTTP endpoints for programmatic access
+- **Modern Web Interface**: Next.js + shadcn/ui + Tailwind CSS for a beautiful, responsive UI
+- **RESTful API**: Flask backend with CORS-enabled HTTP endpoints
 - **Database Persistence**: SQLite database storing all predictions with timestamps
 - **Real-time Statistics**: Dashboard showing prediction history and statistics
+- **Drag & Drop Upload**: Intuitive image upload with preview
 - **Flexible Architecture**: Support for both custom CNN and transfer learning models
 - **Data Augmentation**: Built-in image augmentation for improved model robustness
+- **Delete Functionality**: Manage prediction history with delete and clear all options
 
 ## Project Structure
 
@@ -30,9 +32,18 @@ Image-Classifier-Sprint/
 │   ├── predict.py       # Prediction script
 │   └── database.py      # Database operations
 ├── api/
-│   ├── app.py           # Flask API server
-│   └── templates/
-│       └── index.html   # Web interface
+│   ├── app.py           # Flask API server (CORS-enabled)
+│   └── templates/       # Legacy HTML templates
+├── frontend/            # Next.js frontend application
+│   ├── app/             # Next.js 15 app directory
+│   │   ├── page.tsx     # Main page component
+│   │   ├── layout.tsx   # Root layout
+│   │   └── globals.css  # Global styles with Tailwind
+│   ├── components/      # React components
+│   │   └── ui/          # shadcn/ui components
+│   ├── lib/             # Utility functions
+│   ├── package.json     # Node dependencies
+│   └── tailwind.config.ts
 ├── uploads/             # Temporary upload storage
 ├── tests/               # Test images for demo
 ├── requirements.txt     # Python dependencies
@@ -44,23 +55,30 @@ Image-Classifier-Sprint/
 ### Prerequisites
 
 - Python 3.8 or higher
+- Node.js 18+ and npm
 - pip package manager
 - 4GB+ RAM recommended
 - GPU (optional, for faster training)
 
-### Setup
+### Backend Setup
 
 1. **Clone the repository**:
    ```bash
    cd Image-Classifier-Sprint
    ```
 
-2. **Install dependencies**:
+2. **Create a virtual environment** (recommended):
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install Python dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Prepare your dataset**:
+4. **Prepare your dataset**:
 
    Organize images into the following structure:
    ```
@@ -72,6 +90,23 @@ Image-Classifier-Sprint/
    │   ├── human/    # Validation images of humans
    │   └── robot/    # Validation images of robots
    └── test/         # Test images for evaluation
+   ```
+
+### Frontend Setup
+
+1. **Navigate to frontend directory**:
+   ```bash
+   cd frontend
+   ```
+
+2. **Install Node dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Return to project root**:
+   ```bash
+   cd ..
    ```
 
 ## Usage
@@ -121,22 +156,35 @@ python src/predict.py --image tests/ --model models/robot_human_classifier_trans
 
 ### 3. Running the Web Application
 
-Start the Flask web server:
+The application consists of two parts that need to run simultaneously:
 
+**Terminal 1 - Start the Flask API backend**:
 ```bash
+source venv/bin/activate  # Activate virtual environment
 python api/app.py
 ```
+The API will run on http://localhost:5000
+
+**Terminal 2 - Start the Next.js frontend**:
+```bash
+cd frontend
+npm run dev
+```
+The frontend will run on http://localhost:3000
 
 Then open your browser and navigate to:
 ```
-http://localhost:5000
+http://localhost:3000
 ```
 
-The web interface allows you to:
-- Upload images via drag-and-drop or file selection
-- View real-time predictions with confidence scores
-- See prediction history
-- View statistics (total predictions, accuracy, class distribution)
+The web interface features:
+- Modern, responsive UI with gradient backgrounds
+- Drag-and-drop image upload with instant preview
+- Real-time predictions with animated confidence bars
+- Live statistics dashboard (total predictions, avg confidence, class breakdown)
+- Prediction history with delete functionality
+- Smooth animations and transitions
+- Mobile-friendly design
 
 ### 4. Using the API
 
