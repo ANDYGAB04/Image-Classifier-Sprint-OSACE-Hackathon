@@ -1,3 +1,7 @@
+# OSACE AI-Hackathon
+
+Team GoSky (Suhan Mihai-Andrei,Bila Vlad Gabriel,Grecu Alexandru)
+
 # Robot vs Human Image Classifier
 
 A deep learning-powered image classification system that distinguishes between robots and humans using Convolutional Neural Networks (CNN).
