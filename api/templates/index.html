@@ -173,6 +173,45 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .clear-all-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+
+        .clear-all-btn:hover {
+            background: #c0392b;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         .robot {
@@ -306,7 +345,10 @@
 
         <!-- History Section -->
         <div class="card">
-            <h2>Recent Predictions</h2>
+            <div class="history-header">
+                <h2>Recent Predictions</h2>
+                <button class="clear-all-btn" id="clearAllBtn">Clear All</button>
+            </div>
             <div class="history-section" id="historySection">
                 <p style="text-align: center; color: #999;">No predictions yet</p>
             </div>
@@ -435,13 +477,65 @@
                             <span>${p.filename}</span>
                             <span class="${p.predicted_class}">${p.predicted_class.toUpperCase()}</span>
                             <span>${(p.confidence * 100).toFixed(1)}%</span>
+                            <button class="delete-btn" onclick="deletePrediction(${p.id})">Delete</button>
                         </div>
                     `).join('');
+                } else {
+                    historySection.innerHTML = '<p style="text-align: center; color: #999;">No predictions yet</p>';
                 }
             } catch (error) {
                 console.error('Failed to load history:', error);
             }
         }
+
+        // Delete single prediction
+        async function deletePrediction(id) {
+            if (!confirm('Are you sure you want to delete this prediction?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/prediction/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadHistory();
+                    loadStatistics();
+                } else {
+                    alert('Failed to delete prediction: ' + data.error);
+                }
+            } catch (error) {
+                alert('Delete failed: ' + error.message);
+            }
+        }
+
+        // Clear all predictions
+        document.getElementById('clearAllBtn').addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to delete ALL predictions? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/predictions', {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Deleted ${data.count} predictions`);
+                    loadHistory();
+                    loadStatistics();
+                } else {
+                    alert('Failed to clear predictions: ' + data.error);
+                }
+            } catch (error) {
+                alert('Clear all failed: ' + error.message);
+            }
+        });
 
         // Load statistics
         async function loadStatistics() {

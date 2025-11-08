@@ -175,6 +175,54 @@ def statistics():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/prediction/<int:prediction_id>', methods=['DELETE'])
+def delete_prediction(prediction_id):
+    """
+    Delete a single prediction by ID.
+
+    Args:
+        prediction_id: ID of the prediction to delete
+
+    Returns: JSON with success status
+    """
+    try:
+        success = database.delete_prediction(prediction_id)
+
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Prediction {prediction_id} deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Prediction not found'
+            }), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/predictions', methods=['DELETE'])
+def clear_all_predictions():
+    """
+    Clear all predictions from the database.
+
+    Returns: JSON with count of deleted records
+    """
+    try:
+        count = database.clear_all_predictions()
+
+        return jsonify({
+            'success': True,
+            'message': f'Deleted {count} predictions',
+            'count': count
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     """Serve uploaded files."""

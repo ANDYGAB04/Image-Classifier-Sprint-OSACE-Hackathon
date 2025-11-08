@@ -10,6 +10,7 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import regularizers
 
 
 def create_custom_cnn(input_shape=(224, 224, 3), num_classes=1):
@@ -90,14 +91,15 @@ def create_transfer_learning_model(input_shape=(224, 224, 3),
     if freeze_base:
         base_model.trainable = False
 
-    # Create new model on top
+    # Create new model on top with regularization
     model = Sequential([
         base_model,
         GlobalAveragePooling2D(),
-        Dense(256, activation='relu'),
+        Dropout(0.3),  # Add dropout earlier
+        Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
         Dropout(0.5),
-        Dense(128, activation='relu'),
-        Dropout(0.3),
+        Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
+        Dropout(0.4),
         Dense(num_classes, activation='sigmoid')
     ])
 
