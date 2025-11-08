@@ -244,7 +244,7 @@ export default function Home() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file");
+      console.error("Invalid file type. Please select a valid image file.");
       return;
     }
 
@@ -290,11 +290,12 @@ export default function Home() {
         await loadHistory();
         await loadStatistics();
       } else {
-        alert("Prediction failed: " + response.data.error);
+        console.error("Prediction failed:", response.data.error);
       }
     } catch (error: any) {
-      alert(
-        "Prediction failed: " + (error.response?.data?.error || error.message)
+      console.error(
+        "Prediction failed:",
+        error.response?.data?.error || error.message
       );
     } finally {
       setLoading(false);
@@ -313,29 +314,24 @@ export default function Home() {
   };
 
   const handleDeletePrediction = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this prediction?")) return;
-
     try {
       await axios.delete(`/api/prediction/${id}`);
       await loadHistory();
       await loadStatistics();
     } catch (error) {
-      alert("Failed to delete prediction");
+      console.error("Failed to delete prediction:", error);
     }
   };
 
   const handleClearAll = async () => {
-    if (!confirm("Are you sure you want to delete ALL predictions?")) return;
-
     try {
       const response = await axios.delete("/api/predictions");
       if (response.data.success) {
-        alert(`Deleted ${response.data.count} predictions`);
         await loadHistory();
         await loadStatistics();
       }
     } catch (error) {
-      alert("Failed to clear predictions");
+      console.error("Failed to clear predictions:", error);
     }
   };
 
@@ -829,21 +825,21 @@ export default function Home() {
                         </span>
                         <Badge
                           variant={
-                            confidencePercent < 85
+                            confidencePercent < 60
                               ? "secondary"
                               : pred.predicted_class === "robot"
                               ? "destructive"
                               : "default"
                           }
                           className={`flex-shrink-0 ${
-                            confidencePercent < 85
+                            confidencePercent < 60
                               ? "bg-yellow-500/80 hover:bg-yellow-500 shadow-lg shadow-yellow-500/30"
                               : pred.predicted_class === "robot"
                               ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
                               : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
                           }`}
                         >
-                          {confidencePercent < 85
+                          {confidencePercent < 60
                             ? "UNSURE"
                             : pred.predicted_class.toUpperCase()}
                         </Badge>
