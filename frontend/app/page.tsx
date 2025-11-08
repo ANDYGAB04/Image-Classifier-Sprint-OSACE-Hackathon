@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Upload, Loader2, Trash2, Bot, User, Camera, X } from "lucide-react";
+import {
+  Upload,
+  Loader2,
+  Trash2,
+  Bot,
+  User,
+  Camera,
+  X,
+  BarChart3,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { DottedGlowBackground } from "@/components/dotted-glow-background";
 import { SparklesText } from "@/components/sparkles-text";
+import Link from "next/link";
 import axios from "axios";
 
 interface Prediction {
@@ -377,6 +387,19 @@ export default function Home() {
           <p className="text-lg md:text-xl text-violet-200/90 max-w-2xl mx-auto">
             Advanced deep learning powered image classification system
           </p>
+
+          {/* Analytics Link */}
+          <div className="mt-6">
+            <Link href="/analytics">
+              <Button
+                variant="outline"
+                className="border-violet-400/50 hover:bg-violet-500/20 text-violet-200 hover:text-white backdrop-blur-sm inline-flex items-center gap-2"
+              >
+                <BarChart3 className="w-4 h-4" />
+                View Analytics & Metrics
+              </Button>
+            </Link>
+          </div>
 
           {/* Decorative corner elements */}
           <div className="absolute -top-4 -left-4 w-32 h-32 border-l-2 border-t-2 border-violet-500/30 rounded-tl-3xl" />

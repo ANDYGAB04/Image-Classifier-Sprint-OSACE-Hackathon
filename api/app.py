@@ -252,6 +252,171 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
+@app.route('/analytics/confidence-distribution', methods=['GET'])
+def confidence_distribution():
+    """
+    Get confidence distribution data for chart visualization.
+
+    Returns: JSON with confidence distribution statistics
+    """
+    try:
+        predictions = database.get_all_predictions(limit=None)
+
+        if not predictions:
+            return jsonify({
+                'success': True,
+                'message': 'No predictions available',
+                'total': 0,
+                'distribution': {
+                    'very_high': 0,      # 90-100%
+                    'high': 0,           # 75-89%
+                    'moderate': 0,       # 60-74%
+                    'low': 0             # 0-59%
+                },
+                'by_class': {
+                    'human': {'very_high': 0, 'high': 0, 'moderate': 0, 'low': 0},
+                    'robot': {'very_high': 0, 'high': 0, 'moderate': 0, 'low': 0}
+                },
+                'average_confidence': 0,
+                'chart_data': {
+                    'labels': ['Very High (90-100%)', 'High (75-89%)', 'Moderate (60-74%)', 'Low (0-59%)'],
+                    'values': [0, 0, 0, 0],
+                    'colors': ['#22c55e', '#06b6d4', '#eab308', '#ef4444']
+                }
+            })
+
+        # Calculate distribution
+        distribution = {
+            'very_high': 0,
+            'high': 0,
+            'moderate': 0,
+            'low': 0
+        }
+        by_class = {
+            'human': {'very_high': 0, 'high': 0, 'moderate': 0, 'low': 0},
+            'robot': {'very_high': 0, 'high': 0, 'moderate': 0, 'low': 0}
+        }
+
+        total_confidence = 0.0
+
+        for pred in predictions:
+            conf = pred['confidence']
+            total_confidence += conf
+            pred_class = pred['predicted_class']
+
+            if conf >= 0.9:
+                distribution['very_high'] += 1
+                by_class[pred_class]['very_high'] += 1
+            elif conf >= 0.75:
+                distribution['high'] += 1
+                by_class[pred_class]['high'] += 1
+            elif conf >= 0.6:
+                distribution['moderate'] += 1
+                by_class[pred_class]['moderate'] += 1
+            else:
+                distribution['low'] += 1
+                by_class[pred_class]['low'] += 1
+
+        avg_confidence = total_confidence / len(predictions) if predictions else 0
+
+        return jsonify({
+            'success': True,
+            'total': len(predictions),
+            'distribution': distribution,
+            'by_class': by_class,
+            'average_confidence': float(avg_confidence),
+            'chart_data': {
+                'labels': ['Very High (90-100%)', 'High (75-89%)', 'Moderate (60-74%)', 'Low (0-59%)'],
+                'values': [
+                    distribution['very_high'],
+                    distribution['high'],
+                    distribution['moderate'],
+                    distribution['low']
+                ],
+                'colors': ['#22c55e', '#06b6d4', '#eab308', '#ef4444']
+            }
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analytics/class-distribution', methods=['GET'])
+def class_distribution():
+    """
+    Get class distribution data for chart visualization.
+
+    Returns: JSON with human vs robot distribution
+    """
+    try:
+        predictions = database.get_all_predictions(limit=None)
+
+        human_count = sum(1 for p in predictions if p['predicted_class'] == 'human')
+        robot_count = sum(1 for p in predictions if p['predicted_class'] == 'robot')
+        total = len(predictions)
+
+        human_percent = (human_count / total * 100) if total > 0 else 0
+        robot_percent = (robot_count / total * 100) if total > 0 else 0
+
+        return jsonify({
+            'success': True,
+            'total': total,
+            'human': {
+                'count': human_count,
+                'percentage': float(human_percent)
+            },
+            'robot': {
+                'count': robot_count,
+                'percentage': float(robot_percent)
+            },
+            'chart_data': {
+                'labels': ['Human', 'Robot'],
+                'values': [human_count, robot_count],
+                'colors': ['#22c55e', '#ef4444']
+            }
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analytics/evaluate', methods=['POST'])
+def evaluate_model():
+    """
+    Evaluate model on test dataset and return confusion matrix and metrics.
+
+    Request body:
+        {
+            "test_dir": "data/test"  (optional, defaults to data/test)
+        }
+
+    Returns: JSON with confusion matrix and performance metrics
+    """
+    try:
+        data = request.get_json() or {}
+        test_dir = data.get('test_dir', 'data/test')
+
+        if not os.path.exists(test_dir):
+            return jsonify({
+                'error': f'Test directory not found: {test_dir}',
+                'available_paths': [
+                    'data/test',
+                    'data/val'
+                ]
+            }), 404
+
+        # Evaluate model
+        evaluation_results = predictor.evaluate_on_test_set(test_dir)
+
+        return jsonify({
+            'success': True,
+            'evaluation': evaluation_results
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'Evaluation failed: {str(e)}'}), 500
+
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint."""
