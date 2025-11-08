@@ -13,6 +13,38 @@ A deep learning-powered image classification system that distinguishes between r
 - **Flexible Architecture**: Support for both custom CNN and transfer learning models
 - **Data Augmentation**: Built-in image augmentation for improved model robustness
 - **Delete Functionality**: Manage prediction history with delete and clear all options
+- **Confidence Filtering**: Filter predictions by confidence level using dual-range sliders
+- **Analytics Dashboard**: Comprehensive analytics with confidence distribution charts, class distribution pie chart, and confusion matrix
+- **Performance Metrics**: View model evaluation metrics (Precision, Recall, F1-Score) on test data
+- **Mobile Responsive**: Fully responsive design works on desktop, tablet, and mobile devices
+
+## Quick Start (5 Minutes)
+
+Get up and running in minutes:
+
+```bash
+# 1. Clone and setup backend
+git clone <repo-url>
+cd Image-Classifier-Sprint
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Setup frontend
+cd frontend && npm install && cd ..
+
+# 3. Train model (skip if you have a trained model)
+python src/train.py --model_type transfer --epochs 5
+
+# 4. Run in two terminals
+# Terminal 1:
+python api/app.py
+
+# Terminal 2:
+cd frontend && npm run dev
+
+# 5. Open browser to http://localhost:3000
+```
 
 ## Project Structure
 
@@ -63,17 +95,20 @@ Image-Classifier-Sprint/
 ### Backend Setup
 
 1. **Clone the repository**:
+
    ```bash
    cd Image-Classifier-Sprint
    ```
 
 2. **Create a virtual environment** (recommended):
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install Python dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -81,6 +116,7 @@ Image-Classifier-Sprint/
 4. **Prepare your dataset**:
 
    Organize images into the following structure:
+
    ```
    data/
    ├── train/
@@ -95,11 +131,13 @@ Image-Classifier-Sprint/
 ### Frontend Setup
 
 1. **Navigate to frontend directory**:
+
    ```bash
    cd frontend
    ```
 
 2. **Install Node dependencies**:
+
    ```bash
    npm install
    ```
@@ -159,25 +197,31 @@ python src/predict.py --image tests/ --model models/robot_human_classifier_trans
 The application consists of two parts that need to run simultaneously:
 
 **Terminal 1 - Start the Flask API backend**:
+
 ```bash
 source venv/bin/activate  # Activate virtual environment
 python api/app.py
 ```
+
 The API will run on http://localhost:5000
 
 **Terminal 2 - Start the Next.js frontend**:
+
 ```bash
 cd frontend
 npm run dev
 ```
+
 The frontend will run on http://localhost:3000
 
 Then open your browser and navigate to:
+
 ```
 http://localhost:3000
 ```
 
 The web interface features:
+
 - Modern, responsive UI with gradient backgrounds
 - Drag-and-drop image upload with instant preview
 - Real-time predictions with animated confidence bars
@@ -191,11 +235,13 @@ The web interface features:
 The Flask API provides the following endpoints:
 
 **Predict an image**:
+
 ```bash
 curl -X POST -F "file=@image.jpg" http://localhost:5000/predict
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -207,16 +253,19 @@ Response:
 ```
 
 **Get prediction history**:
+
 ```bash
 curl http://localhost:5000/history?limit=10
 ```
 
 **Get statistics**:
+
 ```bash
 curl http://localhost:5000/statistics
 ```
 
 **Health check**:
+
 ```bash
 curl http://localhost:5000/health
 ```
@@ -259,16 +308,17 @@ curl http://localhost:5000/health
 
 ### Model Performance
 
-| Model Type       | Validation Accuracy | Training Time (10 epochs) |
-|------------------|--------------------:|-------------------------:|
-| Transfer Learning|            95.3%    |         ~15 minutes      |
-| Custom CNN       |            91.7%    |         ~25 minutes      |
+| Model Type        | Validation Accuracy | Training Time (10 epochs) |
+| ----------------- | ------------------: | ------------------------: |
+| Transfer Learning |               95.3% |               ~15 minutes |
+| Custom CNN        |               91.7% |               ~25 minutes |
 
-*Results may vary depending on dataset quality and size*
+_Results may vary depending on dataset quality and size_
 
 ### Training Metrics
 
 After training, the following artifacts are generated:
+
 - Trained model file (`.h5`)
 - Training history plot showing accuracy and loss curves
 
@@ -286,28 +336,103 @@ CREATE TABLE predictions (
 );
 ```
 
+## New Features in Latest Update
+
+### ✨ Confidence Threshold Filtering
+Filter prediction history by confidence level:
+- Use dual-range sliders to select min/max confidence
+- View only high-confidence or uncertain predictions
+- Reset to default with one click
+
+**API**: `GET /history?min_confidence=0.7&max_confidence=0.95`
+
+### 📊 Analytics Dashboard
+Access comprehensive model analytics at `/analytics`:
+
+**Confidence Distribution Tab**:
+- Bar chart showing confidence score distribution
+- Pie chart displaying human vs robot classification split
+- Visual representation of model performance
+
+**Model Evaluation Tab**:
+- Confusion matrix showing prediction accuracy on test data
+- Per-class metrics: Precision, Recall, F1-Score
+- Overall model accuracy
+
+**APIs**:
+- `GET /api/analytics/confidence-distribution` - Confidence data for charts
+- `GET /api/analytics/class-distribution` - Human vs robot split
+- `POST /api/analytics/evaluate` - Full model evaluation and confusion matrix
+
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|------------|---------|-------------|
+| Python | 3.8+ | 3.10+ |
+| Node.js | 18+ | 18+ or higher |
+| RAM | 4GB | 8GB+ |
+| Storage | 2GB | 10GB+ |
+| GPU | Optional | NVIDIA with CUDA (RTX series) |
+
+## FAQ
+
+**Q: I don't have a trained model. How do I get started?**
+A: Run `python src/train.py --model_type transfer --epochs 5` to train a transfer learning model. With a small dataset (50+ images per class), this takes ~10 minutes.
+
+**Q: Can I use my own dataset?**
+A: Yes! Organize your images in `data/train/` and `data/val/` with `human/` and `robot/` subdirectories. Then run `python src/train.py`.
+
+**Q: What's the difference between transfer learning and custom CNN?**
+A: Transfer learning (MobileNetV2) is faster (~15min), more accurate (~95%), requires less data. Custom CNN is more flexible but slower and less accurate on small datasets.
+
+**Q: Can I run this on GPU?**
+A: Yes! Install `pip install tensorflow-gpu` and TensorFlow will automatically detect your GPU.
+
+**Q: How do I deploy this to production?**
+A: Use Docker (see CLAUDE.md for containerization setup) or deploy to cloud services like Heroku, AWS, or Google Cloud Platform.
+
+**Q: Can I use this for other classifications (not just robot/human)?**
+A: Yes! Rename the class folders in `data/train/` and `data/val/` to your desired classes. The code automatically adapts to any binary classification task.
+
+**Q: What image formats are supported?**
+A: JPEG, PNG, BMP, GIF, TIFF. Images are automatically resized to 224x224.
+
+**Q: How can I improve model accuracy?**
+A: (1) Add more diverse training data, (2) increase epochs in training, (3) use data augmentation, (4) try different batch sizes and learning rates.
+
+**Q: Can I use the model in my mobile app?**
+A: Yes! Quantize the model using `src/model.py` and integrate with TensorFlow Lite for iOS/Android.
+
+**Q: Is there a REST API I can use?**
+A: Yes! The Flask backend provides RESTful endpoints. See "Using the API" section for examples. You can also check `QUICKSTART.md` for quick reference.
+
 ## Troubleshooting
 
 ### Common Issues
 
 **1. No module named 'tensorflow'**
+
 ```bash
 pip install tensorflow==2.15.0
 ```
 
 **2. Model file not found**
+
 - Make sure you've trained a model first using `python src/train.py`
 - Check that the model file exists in the `models/` directory
 
 **3. Data directory not found**
+
 - Ensure your data is organized correctly in `data/train/` and `data/val/`
 - Each subdirectory should contain `human/` and `robot/` folders
 
 **4. Out of memory during training**
+
 - Reduce batch size: `--batch_size 16`
 - Use smaller image size: `--image_size 128`
 
 **5. API won't start**
+
 - Check if port 5000 is already in use
 - Ensure all dependencies are installed
 - Verify that a trained model exists in `models/`
