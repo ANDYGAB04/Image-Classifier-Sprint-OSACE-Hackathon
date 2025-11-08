@@ -181,6 +181,39 @@ class PredictionDatabase:
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
 
+    def get_predictions_by_confidence(self, min_confidence=0.0, max_confidence=1.0, limit=None):
+        """
+        Get predictions filtered by confidence threshold.
+
+        Args:
+            min_confidence: Minimum confidence score (0.0-1.0)
+            max_confidence: Maximum confidence score (0.0-1.0)
+            limit: Maximum number of records to return (None for all)
+
+        Returns:
+            List of prediction records
+        """
+        # Clamp values to valid range
+        min_confidence = max(0.0, min(1.0, min_confidence))
+        max_confidence = max(0.0, min(1.0, max_confidence))
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            query = '''
+                SELECT * FROM predictions
+                WHERE confidence BETWEEN ? AND ?
+                ORDER BY timestamp DESC
+            '''
+            
+            if limit:
+                query += f' LIMIT {limit}'
+
+            cursor.execute(query, (min_confidence, max_confidence))
+            rows = cursor.fetchall()
+
+            return [dict(row) for row in rows]
+
     def get_statistics(self):
         """
         Get summary statistics of all predictions.

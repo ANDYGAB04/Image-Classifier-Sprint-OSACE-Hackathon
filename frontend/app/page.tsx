@@ -43,19 +43,28 @@ export default function Home() {
   });
   const [showCamera, setShowCamera] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [minConfidence, setMinConfidence] = useState(0);
+  const [maxConfidence, setMaxConfidence] = useState(100);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   const loadHistory = useCallback(async () => {
     try {
-      const response = await axios.get("/api/history?limit=10");
+      const min = minConfidence / 100;
+      const max = maxConfidence / 100;
+      const response = await axios.get("/api/history?limit=10", {
+        params: {
+          min_confidence: min,
+          max_confidence: max,
+        },
+      });
       if (response.data.success) {
         setHistory(response.data.predictions);
       }
     } catch (error) {
       console.error("Failed to load history:", error);
     }
-  }, []);
+  }, [minConfidence, maxConfidence]);
 
   const loadStatistics = useCallback(async () => {
     try {
@@ -661,49 +670,173 @@ export default function Home() {
             )}
           </div>
 
-          {history.length > 0 ? (
-            <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
-              {history.map((pred) => (
-                <div
-                  key={pred.id}
-                  className="flex items-center justify-between p-4 bg-violet-950/40 backdrop-blur-md rounded-lg hover:bg-violet-900/50 transition-all duration-300 border border-violet-500/30 hover:border-violet-400/50 shadow-md"
-                >
-                  <span className="text-sm flex-1 truncate text-violet-200 font-medium">
-                    {pred.filename}
-                  </span>
-                  <Badge
-                    variant={
-                      pred.predicted_class === "robot"
-                        ? "destructive"
-                        : "default"
-                    }
-                    className={`mx-3 ${
-                      pred.predicted_class === "robot"
-                        ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
-                        : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
-                    }`}
-                  >
-                    {pred.predicted_class.toUpperCase()}
-                  </Badge>
-                  <span className="text-sm font-bold min-w-[70px] text-right text-violet-300">
-                    {(pred.confidence * 100).toFixed(1)}%
-                  </span>
+          {/* Confidence Threshold Filter */}
+          <div className="bg-gradient-to-r from-violet-950/60 to-purple-950/60 backdrop-blur-md p-6 rounded-lg border border-violet-500/30 shadow-lg shadow-violet-500/20">
+            <div className="space-y-4">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-violet-400 rounded-full" />
+                Confidence Threshold Filter
+              </h4>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <label className="text-xs text-violet-300 font-medium">
+                      Minimum: {minConfidence}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={minConfidence}
+                      onChange={(e) => {
+                        const newMin = parseInt(e.target.value);
+                        if (newMin <= maxConfidence) {
+                          setMinConfidence(newMin);
+                        }
+                      }}
+                      className="w-full h-2 bg-violet-900/50 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                    />
+                  </div>
+                  <div className="text-xs text-violet-400 font-medium">
+                    {minConfidence}%
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <label className="text-xs text-violet-300 font-medium">
+                      Maximum: {maxConfidence}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={maxConfidence}
+                      onChange={(e) => {
+                        const newMax = parseInt(e.target.value);
+                        if (newMax >= minConfidence) {
+                          setMaxConfidence(newMax);
+                        }
+                      }}
+                      className="w-full h-2 bg-violet-900/50 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                    />
+                  </div>
+                  <div className="text-xs text-purple-400 font-medium">
+                    {maxConfidence}%
+                  </div>
+                </div>
+
+                <div className="flex gap-2 items-center justify-between pt-2 border-t border-violet-500/20">
+                  <div className="text-xs text-violet-300">
+                    <span className="font-semibold">{minConfidence}%</span>
+                    <span className="text-violet-400"> — </span>
+                    <span className="font-semibold">{maxConfidence}%</span>
+                  </div>
                   <Button
-                    variant="ghost"
                     size="sm"
-                    onClick={() => handleDeletePrediction(pred.id)}
-                    className="ml-3 hover:bg-red-500/20 text-red-400 hover:text-red-300"
+                    onClick={() => {
+                      setMinConfidence(0);
+                      setMaxConfidence(100);
+                    }}
+                    variant="outline"
+                    className="h-7 text-xs border-violet-500/50 text-violet-300 hover:bg-violet-500/20 backdrop-blur-sm"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    Reset
                   </Button>
                 </div>
-              ))}
+              </div>
+            </div>
+          </div>
+
+          {history.length > 0 ? (
+            <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+              {history.map((pred) => {
+                const confidencePercent = pred.confidence * 100;
+                const getConfidenceColor = (conf: number) => {
+                  if (conf >= 90) return "from-green-500 to-emerald-500";
+                  if (conf >= 75) return "from-cyan-500 to-blue-500";
+                  if (conf >= 60) return "from-yellow-500 to-orange-500";
+                  return "from-orange-500 to-red-500";
+                };
+
+                const getConfidenceBgColor = (conf: number) => {
+                  if (conf >= 90) return "bg-green-500/20";
+                  if (conf >= 75) return "bg-cyan-500/20";
+                  if (conf >= 60) return "bg-yellow-500/20";
+                  return "bg-orange-500/20";
+                };
+
+                return (
+                  <div
+                    key={pred.id}
+                    className="flex flex-col gap-2 p-4 bg-violet-950/40 backdrop-blur-md rounded-lg hover:bg-violet-900/50 transition-all duration-300 border border-violet-500/30 hover:border-violet-400/50 shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm flex-1 truncate text-violet-200 font-medium">
+                        {pred.filename}
+                      </span>
+                      <Badge
+                        variant={
+                          pred.predicted_class === "robot"
+                            ? "destructive"
+                            : "default"
+                        }
+                        className={`mx-3 ${
+                          pred.predicted_class === "robot"
+                            ? "bg-red-500/80 hover:bg-red-500 shadow-lg shadow-red-500/30"
+                            : "bg-green-500/80 hover:bg-green-500 shadow-lg shadow-green-500/30"
+                        }`}
+                      >
+                        {pred.predicted_class.toUpperCase()}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeletePrediction(pred.id)}
+                        className="hover:bg-red-500/20 text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-violet-300">
+                            Confidence
+                          </span>
+                          <span
+                            className={`text-xs font-bold ${getConfidenceBgColor(
+                              confidencePercent
+                            )} px-2 py-1 rounded`}
+                          >
+                            {confidencePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`h-full bg-gradient-to-r ${getConfidenceColor(
+                              confidencePercent
+                            )} transition-all duration-300 rounded-full shadow-lg`}
+                            style={{ width: `${confidencePercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-violet-400/60">
+                      {new Date(pred.timestamp).toLocaleString()}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center text-violet-300/60 py-16 bg-black/30 backdrop-blur-sm rounded-lg border border-violet-500/20">
-              <p className="text-lg">No predictions yet</p>
+              <p className="text-lg">No predictions in range</p>
               <p className="text-sm mt-2">
-                Start classifying images to see your history
+                Try adjusting the confidence threshold to see results
               </p>
             </div>
           )}

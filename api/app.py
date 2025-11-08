@@ -141,16 +141,37 @@ def history():
 
     Query params:
         limit (int): Maximum number of records to return
+        min_confidence (float): Minimum confidence threshold (0.0-1.0)
+        max_confidence (float): Maximum confidence threshold (0.0-1.0)
 
     Returns: JSON array of prediction records
     """
     try:
         limit = request.args.get('limit', type=int, default=50)
-        predictions = database.get_all_predictions(limit=limit)
+        min_confidence = request.args.get('min_confidence', type=float, default=0.0)
+        max_confidence = request.args.get('max_confidence', type=float, default=1.0)
+
+        # Validate confidence values
+        min_confidence = max(0.0, min(1.0, min_confidence))
+        max_confidence = max(0.0, min(1.0, max_confidence))
+
+        # Ensure min <= max
+        if min_confidence > max_confidence:
+            min_confidence, max_confidence = max_confidence, min_confidence
+
+        predictions = database.get_predictions_by_confidence(
+            min_confidence=min_confidence,
+            max_confidence=max_confidence,
+            limit=limit
+        )
 
         return jsonify({
             'success': True,
             'count': len(predictions),
+            'filters': {
+                'min_confidence': min_confidence,
+                'max_confidence': max_confidence
+            },
             'predictions': predictions
         })
 
