@@ -210,7 +210,7 @@ def main():
 
     for step in steps:
         if not step():
-            print("\n❌ Setup failed. Please fix the errors above and try again.")
+            print("\n❌ Setup failed. Please fix the errors above and try again")
             return False
 
     print_next_steps()
