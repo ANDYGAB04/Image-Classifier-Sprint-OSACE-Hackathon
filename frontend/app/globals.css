@@ -67,3 +67,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Camera modal styles */
+@layer components {
+  .camera-preview video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
+    .camera-preview video {
+      max-height: 50vh;
+    }
+  }
+}

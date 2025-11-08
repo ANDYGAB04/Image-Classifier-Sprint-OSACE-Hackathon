@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { Upload, Loader2, Trash2, Bot, User } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Upload, Loader2, Trash2, Bot, User, Camera, X } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -40,6 +46,10 @@ export default function Home() {
     average_confidence: 0,
     predictions_by_class: { robot: 0, human: 0 },
   });
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -67,6 +77,153 @@ export default function Home() {
     loadHistory();
     loadStatistics();
   }, [loadHistory, loadStatistics]);
+
+  // Cleanup camera stream on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  const startCamera = async () => {
+    console.log("startCamera called");
+    setCameraError(null);
+    setShowCamera(true);
+
+    // Check if running in browser and if MediaDevices API is supported
+    if (
+      typeof window === "undefined" ||
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+      console.log("Camera not supported");
+      const isSecure =
+        typeof window !== "undefined" &&
+        (window.location.protocol === "https:" ||
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1");
+      let errorMsg = "Camera is not supported in this browser. ";
+      if (!isSecure) {
+        errorMsg =
+          "Camera requires HTTPS connection. Please access this page via HTTPS or use localhost for development.";
+      } else {
+        errorMsg +=
+          "Please use a modern browser like Chrome, Firefox, or Safari.";
+      }
+      setCameraError(errorMsg);
+      setShowCamera(false);
+      return;
+    }
+
+    console.log("Requesting camera access...");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment", // Prefer back camera on mobile
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
+      });
+
+      console.log("Camera access granted", stream);
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error: any) {
+      console.error("Camera error:", error);
+      let errorMessage = "Failed to access camera. ";
+
+      if (
+        error.name === "NotAllowedError" ||
+        error.name === "PermissionDeniedError"
+      ) {
+        errorMessage += "Please grant camera permissions and try again.";
+      } else if (
+        error.name === "NotFoundError" ||
+        error.name === "DevicesNotFoundError"
+      ) {
+        errorMessage += "No camera found on your device.";
+      } else if (
+        error.name === "NotReadableError" ||
+        error.name === "TrackStartError"
+      ) {
+        errorMessage += "Camera is already in use by another application.";
+      } else if (error.name === "OverconstrainedError") {
+        errorMessage += "Camera doesn't support the required settings.";
+      } else if (
+        error.name === "NotSupportedError" ||
+        error.name === "TypeError"
+      ) {
+        errorMessage =
+          "Camera requires HTTPS connection. Please access this page via HTTPS.";
+      } else {
+        errorMessage += error.message || "Unknown error occurred.";
+      }
+
+      setCameraError(errorMessage);
+      setShowCamera(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setShowCamera(false);
+    setCameraError(null);
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    // Draw the video frame to the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas to blob and create file
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+
+        const file = new File([blob], `camera_capture_${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        // Set the captured image as the selected file
+        setSelectedFile(file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreview(e.target?.result as string);
+          setPrediction(null);
+        };
+        reader.readAsDataURL(file);
+
+        // Stop camera and auto-classify
+        stopCamera();
+
+        // Automatically run classification
+        setTimeout(() => {
+          handlePredictWithFile(file);
+        }, 100);
+      },
+      "image/jpeg",
+      0.95
+    );
+  };
 
   const handleFileChange = (file: File | null) => {
     if (!file) return;
@@ -101,12 +258,12 @@ export default function Home() {
     handleFileChange(file);
   };
 
-  const handlePredict = async () => {
-    if (!selectedFile) return;
+  const handlePredictWithFile = async (file: File) => {
+    if (!file) return;
 
     setLoading(true);
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", file);
 
     try {
       const response = await axios.post("/api/predict", formData);
@@ -121,10 +278,17 @@ export default function Home() {
         alert("Prediction failed: " + response.data.error);
       }
     } catch (error: any) {
-      alert("Prediction failed: " + (error.response?.data?.error || error.message));
+      alert(
+        "Prediction failed: " + (error.response?.data?.error || error.message)
+      );
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePredict = async () => {
+    if (!selectedFile) return;
+    await handlePredictWithFile(selectedFile);
   };
 
   const handleClear = () => {
@@ -174,16 +338,103 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Camera Modal */}
+        {showCamera && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+            <div className="relative w-full max-w-4xl">
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-violet-500 to-purple-600 text-white">
+                  <CardTitle className="flex items-center gap-2">
+                    <Camera className="w-6 h-6" />
+                    Camera
+                  </CardTitle>
+                  <CardDescription className="text-white/90">
+                    Position your subject and click Capture
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {cameraError ? (
+                    <div className="p-8 text-center">
+                      <div className="text-red-500 mb-4">
+                        <X className="w-16 h-16 mx-auto mb-4" />
+                        <p className="text-lg font-semibold mb-2">
+                          Camera Access Error
+                        </p>
+                        <p className="text-sm text-gray-600">{cameraError}</p>
+                      </div>
+                      <Button onClick={stopCamera} variant="outline">
+                        Close
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="relative bg-black min-h-[400px] flex items-center justify-center">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="w-full h-auto max-h-[60vh] object-contain"
+                        />
+                      </div>
+                      <div className="p-4 flex gap-3 justify-center bg-gray-50">
+                        <Button
+                          onClick={capturePhoto}
+                          size="lg"
+                          className="flex-1 max-w-xs"
+                        >
+                          <Camera className="mr-2 h-5 w-5" />
+                          Capture Photo
+                        </Button>
+                        <Button
+                          onClick={stopCamera}
+                          variant="outline"
+                          size="lg"
+                        >
+                          <X className="mr-2 h-5 w-5" />
+                          Cancel
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* Upload Section */}
           <Card>
             <CardHeader>
               <CardTitle>Upload Image</CardTitle>
               <CardDescription>
-                Drag and drop or click to select an image
+                Drag and drop, use camera, or click to select an image
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Camera Button */}
+              <Button
+                onClick={startCamera}
+                variant="outline"
+                className="w-full border-2 border-dashed hover:border-primary hover:bg-primary/5"
+                size="lg"
+              >
+                <Camera className="mr-2 h-5 w-5" />
+                Use Camera
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">
+                    Or
+                  </span>
+                </div>
+              </div>
+
               <div
                 className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                   isDragging
@@ -321,7 +572,9 @@ export default function Home() {
             <div className="flex justify-between items-center">
               <div>
                 <CardTitle>Recent Predictions</CardTitle>
-                <CardDescription>View your classification history</CardDescription>
+                <CardDescription>
+                  View your classification history
+                </CardDescription>
               </div>
               {history.length > 0 && (
                 <Button
@@ -347,7 +600,11 @@ export default function Home() {
                       {pred.filename}
                     </span>
                     <Badge
-                      variant={pred.predicted_class === "robot" ? "destructive" : "default"}
+                      variant={
+                        pred.predicted_class === "robot"
+                          ? "destructive"
+                          : "default"
+                      }
                       className="mx-2"
                     >
                       {pred.predicted_class.toUpperCase()}
