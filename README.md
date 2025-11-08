@@ -488,6 +488,7 @@ python src/predict.py --image tests/ --model models/your_model.h5
 ## Version History
 
 ### v2.3.0 (Latest)
+
 - ✨ **Analytics Dashboard**: New `/analytics` page with charts and confusion matrix
 - 📊 **Confidence Distribution Charts**: Visual representation of prediction confidence
 - 🎯 **Confidence Filtering**: Filter predictions by confidence level range
@@ -495,22 +496,26 @@ python src/predict.py --image tests/ --model models/your_model.h5
 - 🔄 **Improved Navigation**: Back button from analytics to home
 
 ### v2.2.0
+
 - Enhanced prediction history display with color-coded confidence bars
 - Real-time statistics update
 - Improved error handling for missing files
 
 ### v2.1.0
+
 - Next.js 15 frontend upgrade
 - Shadcn/ui component library integration
 - Mobile responsive design improvements
 
 ### v2.0.0
+
 - Transfer learning model support (MobileNetV2)
 - RESTful API endpoints
 - SQLite database integration
 - Modern web interface with React
 
 ### v1.0.0
+
 - Initial release with custom CNN
 - Basic image upload and prediction
 - Command-line interface
@@ -561,6 +566,7 @@ Contributions are welcome! Here's how to get started:
 ### Reporting Issues
 
 Found a bug? Open an issue with:
+
 - Clear description of the problem
 - Steps to reproduce
 - Expected vs actual behavior
@@ -571,16 +577,16 @@ Found a bug? Open an issue with:
 
 Typical performance on standard hardware:
 
-| Task | Time | Hardware |
-|------|------|----------|
-| Single image prediction | 0.2-0.5s | CPU (Intel i7) |
-| Single image prediction | 0.05-0.1s | GPU (RTX 3080) |
-| Batch prediction (100 images) | 20-30s | CPU |
-| Batch prediction (100 images) | 3-5s | GPU |
-| Model training (10 epochs, 500 images) | 15 min | CPU |
-| Model training (10 epochs, 500 images) | 3 min | GPU |
+| Task                                   | Time      | Hardware       |
+| -------------------------------------- | --------- | -------------- |
+| Single image prediction                | 0.2-0.5s  | CPU (Intel i7) |
+| Single image prediction                | 0.05-0.1s | GPU (RTX 3080) |
+| Batch prediction (100 images)          | 20-30s    | CPU            |
+| Batch prediction (100 images)          | 3-5s      | GPU            |
+| Model training (10 epochs, 500 images) | 15 min    | CPU            |
+| Model training (10 epochs, 500 images) | 3 min     | GPU            |
 
-*Benchmarks are approximate and vary based on image size and system configuration*
+_Benchmarks are approximate and vary based on image size and system configuration_
 
 ## Resources & Documentation
 
